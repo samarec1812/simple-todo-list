@@ -1,20 +1,25 @@
 package service
 
-import "context"
+import (
+	"context"
+	"github.com/samarec1812/simple-todo-list/internal/app/entity/todo"
+	"github.com/samarec1812/simple-todo-list/internal/app/entity/user"
+)
 
 type TodoListRepository interface {
-	Create(ctx context.Context, userID int) error
+	Create(context.Context, int64, todo.TodoList) error
 }
 
 type UserRepository interface {
-	Create(context.Context) error
+	Create(context.Context, user.User) error
 }
 
 type App interface {
 	// User methods
-	CreateUser(context.Context) error
+	CreateUser(context.Context, string, string) error
 
 	// CreateTodo
+	CreateTodoList(context.Context, int64, string, string) error
 }
 
 type app struct {
@@ -28,17 +33,3 @@ func NewApp(userRepo UserRepository, todoListRepo TodoListRepository) App {
 		todoListRepo: todoListRepo,
 	}
 }
-
-func (a *app) CreateUser(ctx context.Context) error {
-	return a.userRepo.Create(ctx)
-}
-
-//func (a *app) SaveEvent(ctx context.Context, headers, body map[string]any) error {
-//	err := entity.Validate(headers, body)
-//	if err != nil {
-//		return err
-//	}
-//	event := entity.NewEvent(headers, body)
-//
-//	return a.eventRepo.Save(ctx, *event)
-//}

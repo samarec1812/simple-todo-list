@@ -17,34 +17,22 @@ func CreateUser(log *slog.Logger, a service.App) http.HandlerFunc {
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		var reqBody map[string]any
+		var reqBody userCreateRequest
 		if err := render.DecodeJSON(r.Body, &reqBody); err != nil {
 			log.Error("failed to decode request body", err)
-			render.JSON(w, r, nil) // EventErrorResponse(status.GetStringStatusByCode(http.StatusBadRequest), err))
+			render.JSON(w, r, UserErrorResponse(err))
 
 			return
 		}
-		//
-		//headers := make(map[string]any)
-		//for key, value := range r.Header {
-		//	headers[key] = value
-		//}
-		//
-		err := a.CreateUser(r.Context())
+
+		err := a.CreateUser(r.Context(), reqBody.Name, reqBody.Username)
 		if err != nil {
 			log.Error("error with save", err)
-			render.JSON(w, r, nil) //  EventErrorResponse(status.GetStringStatusByCode(http.StatusBadRequest), err))
+			render.JSON(w, r, UserErrorResponse(err))
 
 			return
 		}
-		//err := a.SaveEvent(r.Context(), headers, reqBody)
-		//if err != nil {
-		//	log.Error("error with save", err)
-		//	render.JSON(w, r, EventErrorResponse(status.GetStringStatusByCode(http.StatusBadRequest), err))
-		//
-		//	return
-		//}
 
-		render.JSON(w, r, nil) // status.GetStringStatusByCode(http.StatusAccepted))
+		render.JSON(w, r, UserSuccessResponse("OK"))
 	}
 }

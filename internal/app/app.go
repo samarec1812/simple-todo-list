@@ -14,6 +14,8 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	ht "github.com/samarec1812/simple-todo-list/internal/app/ports/http"
+	"github.com/samarec1812/simple-todo-list/internal/app/repository/postgres/todo"
+	"github.com/samarec1812/simple-todo-list/internal/app/repository/postgres/user"
 	"github.com/samarec1812/simple-todo-list/internal/app/service"
 	"github.com/samarec1812/simple-todo-list/internal/config"
 	"github.com/samarec1812/simple-todo-list/internal/pkg/logger"
@@ -37,9 +39,10 @@ func Run(cfg *config.Config) {
 	}
 
 	log.Info("database connect successful")
-	eventRepo := db // event.NewEventRepository(db)
+	userRepo := user.NewUserRepository(db)
+	todoRepo := todo.NewTodoListRepository(db)
 
-	app := service.NewApp(eventRepo)
+	app := service.NewApp(userRepo, todoRepo)
 	srv := ht.NewHTTPServer(cfg.HTTPServer, log, app)
 
 	eg, ctx := errgroup.WithContext(context.Background())
